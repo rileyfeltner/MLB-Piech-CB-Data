@@ -1,0 +1,45 @@
+---
+title: "MLB + Piech CB Data"
+author: "Riley Feltner"
+date: "10/26/2022"
+output: html_document
+---
+
+#Load MLB CB Data
+```{r}
+CBdata <- read.csv("CB Data 2022.csv")
+```
+
+#Clean Data
+```{r}
+library(dplyr)
+CBdata1 <- CBdata[-c(1:4),]
+CBdata2 <- CBdata1[c(1:2, 18)]
+CBdata2[,3] <- sapply(CBdata2[,3],as.numeric)
+NoPositionPlayerCB <- CBdata2 %>% filter(TMIndVertBrk < -5)
+CBdataFinal<- NoPositionPlayerCB[order(NoPositionPlayerCB$TMIndVertBrk),] %>% head(5)
+
+```
+
+#Bar Chart
+```{r}
+library(tibble)
+library(ggplot2)
+ggplot(CBdataFinal, aes(x = player, y = TMIndVertBrk, fill = ifelse(player == "Piech", "Highlighted", "Normal"), color = ifelse(player == "Piech", "Highlighted", "Normal"))) +
+  geom_col(width = 0.5, alpha = 0.75, stat = "identify", show.legend = FALSE)+
+  scale_fill_manual(name = "Piech", values = c("brown4", "dodgerblue3"))+
+  scale_color_manual(name = "Piech", values = c("darkgoldenrod1", "red2"))+
+  scale_x_discrete(limits = c("Coulombe", "Piech", "Estrada", "Richards", "Pivetta"))+
+  theme_classic()+
+  geom_text(aes(label = TMIndVertBrk),vjust = -0.5, size = 3.0, color = "black")+
+  labs(y = "Induced Vertical Break (Inches)",
+       x = "",
+       title = "Top 5 MLB + Piech Curveball Induced Vertical Break",
+       caption = "-Riley Feltner")+
+  coord_cartesian(ylim = c(-20,-15))
+
+```
+
+
+
+
